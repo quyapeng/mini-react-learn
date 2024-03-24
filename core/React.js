@@ -44,6 +44,7 @@ function render(el, container) {
   // 3.append
   const children = el.props.children;
   children.forEach((child) => {
+    // js是单线程，执行代码过程中阻塞后续渲染。
     render(child, dom);
   });
   container.append(dom);
