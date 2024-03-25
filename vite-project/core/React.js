@@ -28,7 +28,11 @@ function render(el, container) {
       children: [el],
     },
   };
+
+  root = nextWorkOfUnit;
 }
+
+let root = null;
 
 let nextWorkOfUnit = null;
 function workLoop(deadline) {
@@ -41,7 +45,24 @@ function workLoop(deadline) {
     shouldYield = deadline.timeRemaining() < 1;
   }
 
+  if (!nextWorkOfUnit && root) {
+    // 链表处理结束
+    commitRoot();
+  }
+
   requestIdleCallback(workLoop);
+}
+
+function commitRoot() {
+  commitWork(root.child);
+  root = null;
+}
+
+function commitWork(fiber) {
+  if (!fiber) return;
+  fiber.parent.dom.append(fiber.dom);
+  commitWork(fiber.child);
+  commitWork(fiber.sibling);
 }
 
 function createDom(type) {
