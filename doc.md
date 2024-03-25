@@ -37,3 +37,16 @@ s3: vdom 动态生成，dom 动态生成（递归）
 5.代码链接
 https://github.com/quyapeng/mini-react-learn
 欢迎 star
+
+
+1.学到了什么？
+a.优化提交方式，重复的动作可以提炼出来单独执行.b.断点调试
+2.遇到问题？
+思考的还是不够，functionComponent第一次就应该想到边缘情况 
+3.这节课对自己有什么帮助？
+还需要多思考，处理好边缘状态。 
+4.哪些知识点可迁移？
+很多项目功能都应该提前考虑到边缘状态。
+5.代码链接
+https://github.com/quyapeng/mini-react-learn
+欢迎 star
