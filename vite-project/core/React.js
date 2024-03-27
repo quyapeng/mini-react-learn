@@ -84,7 +84,13 @@ function updateProps(dom, props) {
   Object.keys(props).forEach((key) => {
     // 只处理非children的props
     if (key !== "children") {
-      dom[key] = props[key];
+      if (key.startsWith("on")) {
+        //
+        const event = key.slice(2).toLowerCase();
+        dom.addEventListener(event, props[key]);
+      } else {
+        dom[key] = props[key];
+      }
     }
   });
 }
@@ -110,12 +116,12 @@ function initChildren(fiber, children) {
 }
 
 function updateFunctionComponent(fiber) {
-  if (!fiber.dom) {
-    const dom = (fiber.dom = createDom(fiber.type));
+  //   if (!fiber.dom) {
+  //     const dom = (fiber.dom = createDom(fiber.type));
 
-    updateProps(dom, fiber.props);
-  }
-  const children = fiber.props.children;
+  //     updateProps(dom, fiber.props);
+  //   }
+  const children = [fiber.type(fiber.props)];
   initChildren(fiber, children);
 }
 
@@ -124,6 +130,8 @@ function updateHostComponent(fiber) {
     const dom = (fiber.dom = createDom(fiber.type));
     updateProps(dom, fiber.props);
   }
+  const children = fiber.props.children;
+  initChildren(fiber, children);
 }
 
 function performUnitOfWork(fiber) {

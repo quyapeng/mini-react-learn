@@ -1,14 +1,17 @@
 import React from "./core/React.js";
 
 function Counter({num}){
-    return <div>count: {num}</div>
+function handleClick (){
+    console.log('click')
+}
+    return (<div>count: {num}<button onClick={handleClick}>click</button></div>)
 }
 function CounterContainer(){
     return <Counter num={10}>count</Counter>
 }
 
 function App (){
-    return <div>hi,mini-react<Counter num={10}>count</Counter><Counter num={20}>count</Counter></div>
+    return <div>hi,mini-react<Counter num={10}>count</Counter></div>
 }
 
 // const App = <div>hi,mini-react<CounterContainer></CounterContainer>
