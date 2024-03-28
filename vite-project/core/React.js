@@ -24,20 +24,21 @@ function createElement(type, props, ...children) {
 
 function render(el, container) {
   //
-  nextWorkOfUnit = {
+  wipRoot = {
     dom: container,
     props: {
       children: [el],
     },
   };
-
-  root = nextWorkOfUnit;
+  nextWorkOfUnit = wipRoot;
 }
-
-let root = null;
+// work in progress
+let wipRoot = null;
 let currentRoot = null;
-
+let wipFiber = null;
 let nextWorkOfUnit = null;
+
+let deletions = [];
 function workLoop(deadline) {
   // console.log(deadline.timeRemaining());
 
@@ -45,10 +46,16 @@ function workLoop(deadline) {
   while (!shouldYield && nextWorkOfUnit) {
     // 执行任务
     nextWorkOfUnit = performUnitOfWork(nextWorkOfUnit);
+
+    if (wipRoot?.sibling?.type === nextWorkOfUnit?.type) {
+      console.log("hit", wipRoot, nextWorkOfUnit);
+      nextWorkOfUnit = undefined;
+    }
+
     shouldYield = deadline.timeRemaining() < 1;
   }
 
-  if (!nextWorkOfUnit && root) {
+  if (!nextWorkOfUnit && wipRoot) {
     // 链表处理结束
     commitRoot();
   }
@@ -57,11 +64,24 @@ function workLoop(deadline) {
 }
 
 function commitRoot() {
-  commitWork(root.child);
-  currentRoot = root;
-  root = null;
+  deletions.forEach(commitDeletion);
+  commitWork(wipRoot.child);
+  currentRoot = wipRoot;
+  wipRoot = null;
+  deletions = [];
 }
 
+function commitDeletion(fiber) {
+  if (fiber.dom) {
+    let fiberParent = fiber.parent;
+    while (!fiberParent.dom) {
+      fiberParent = fiberParent.parent;
+    }
+    fiberParent.dom.removeChild(fiber.dom);
+  } else {
+    commitDeletion(fiber.child);
+  }
+}
 function commitWork(fiber) {
   if (!fiber) return;
 
@@ -126,7 +146,7 @@ function updateProps(dom, nextProps, prevProps) {
   });
 }
 
-function initChildren(fiber, children) {
+function reconcileChildren(fiber, children) {
   let oldFiber = fiber.alternate?.child;
   let prevChild = null;
   children.forEach((child, index) => {
@@ -145,15 +165,20 @@ function initChildren(fiber, children) {
         alternate: oldFiber,
       };
     } else {
-      newFiber = {
-        type: child.type,
-        props: child.props,
-        child: null,
-        parent: fiber,
-        sibling: null,
-        dom: null,
-        effectTag: "placement",
-      };
+      if (child) {
+        newFiber = {
+          type: child.type,
+          props: child.props,
+          child: null,
+          parent: fiber,
+          sibling: null,
+          dom: null,
+          effectTag: "placement",
+        };
+      }
+      if (oldFiber) {
+        deletions.push(oldFiber);
+      }
     }
     if (oldFiber) {
       oldFiber = oldFiber.sibling;
@@ -164,8 +189,17 @@ function initChildren(fiber, children) {
     } else {
       prevChild.sibling = newFiber;
     }
-    prevChild = newFiber;
+    if (newFiber) {
+      prevChild = newFiber;
+    }
   });
+  // if (oldFiber) {
+  //   deletions.push(oldFiber);
+  // }
+  while (oldFiber) {
+    deletions.push(oldFiber);
+    oldFiber = oldFiber.sibling;
+  }
 }
 
 // function updateFunctionComponent(fiber) {
@@ -178,9 +212,10 @@ function initChildren(fiber, children) {
 //   initChildren(fiber, children);
 // }
 function updateFunctionComponent(fiber) {
+  wipFiber = fiber;
   const children = [fiber.type(fiber.props)];
 
-  initChildren(fiber, children);
+  reconcileChildren(fiber, children);
 }
 
 function updateHostComponent(fiber) {
@@ -189,7 +224,7 @@ function updateHostComponent(fiber) {
     updateProps(dom, fiber.props, {});
   }
   const children = fiber.props.children;
-  initChildren(fiber, children);
+  reconcileChildren(fiber, children);
 }
 
 function performUnitOfWork(fiber) {
@@ -261,13 +296,23 @@ requestIdleCallback(workLoop);
 //
 function update() {
   //
-  nextWorkOfUnit = {
-    dom: currentRoot.dom,
-    props: currentRoot.props,
-    alternate: currentRoot,
-  };
+  // console.log("wipFiber", wipFiber);
 
-  root = nextWorkOfUnit;
+  let currentFiber = wipFiber;
+  return () => {
+    console.log(currentFiber);
+    wipFiber = {
+      ...currentFiber,
+      alternate: currentFiber,
+    };
+    // wipRoot = {
+    //   dom: currentRoot.dom,
+    //   props: currentRoot.props,
+    //   alternate: currentRoot,
+    // };
+
+    nextWorkOfUnit = wipRoot;
+  };
 }
 
 const React = {
