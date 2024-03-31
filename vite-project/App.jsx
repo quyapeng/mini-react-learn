@@ -40,7 +40,8 @@ function Foo(){
         // countFoo++;
         // update()
         setCount((c)=>c+1)
-        setBar((s)=> s+'123')
+        // setBar((s)=> s+'123')
+        setBar('bar')
     }
     return (
         <div>
