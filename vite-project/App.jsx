@@ -1,6 +1,6 @@
 import React from "./core/React.js";
-let count = 1;
-const props = {id:"test"}
+// let count = 1;
+// const props = {id:"test"}
 // function Counter({num}){
 // function handleClick (){
 //     console.log('click')
@@ -33,35 +33,40 @@ const props = {id:"test"}
 
 let countFoo = 1;
 function Foo(){
-    const update = React.update();
+    const [count, setCount] = React.useState(10)
+    const [bar, setBar] = React.useState('bar')
+    // const update = React.update();
     function handleClick(){
-        countFoo++;
-        update()
+        // countFoo++;
+        // update()
+        setCount((c)=>c+1)
+        setBar((s)=> s+'123')
     }
     return (
         <div>
             <h1>foo</h1>
-            {countFoo}
+            <h1>{count}</h1>
+            <h1>{bar}</h1>
             <button onClick={handleClick}>click</button>
         </div>
     )
 }
 
-let countBar = 1;
-function Bar(){
-    const update = React.update();
-    function handleClick(){
-        countBar++;
-        update()
-    }
-    return (
-        <div>
-            <h1>bar</h1>
-            {countBar}
-            <button onClick={handleClick}>click</button>
-        </div>
-    )
-}
+// let countBar = 1;
+// function Bar(){
+//     const update = React.update();
+//     function handleClick(){
+//         countBar++;
+//         update()
+//     }
+//     return (
+//         <div>
+//             <h1>bar</h1>
+//             {countBar}
+//             <button onClick={handleClick}>click</button>
+//         </div>
+//     )
+// }
 
 let countRoot = 1;
 function App (){
@@ -71,9 +76,9 @@ function App (){
         update()
     }
     return (<div>hi,mini-react,countRoot:{countRoot}
-        <button onClick={handleClick}>click</button>
+        {/* <button onClick={handleClick}>click</button> */}
         <Foo />
-        <Bar />
+        {/* <Bar /> */}
     </div>)
 }
 
