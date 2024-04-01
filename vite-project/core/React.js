@@ -55,6 +55,9 @@ function workLoop(deadline) {
   if (!nextWorkOfUnit && wipRoot) {
     commitRoot();
   }
+  if (nextWorkOfUnit && !wipRoot) {
+    wipRoot = currentRoot;
+  }
 
   requestIdleCallback(workLoop);
 }
@@ -131,7 +134,7 @@ function commitWork(fiber) {
     fiberParent = fiberParent.parent;
   }
 
-  if (fiber.effectTag === "update") {
+  if (fiber.effectTag === "update" && fiber.dom) {
     // update
     updateProps(fiber.dom, fiber.props, fiber.alternate?.props);
   } else if (fiber.effectTag === "placement") {
@@ -140,9 +143,9 @@ function commitWork(fiber) {
     }
   }
 
-  if (fiber.dom) {
-    fiberParent.dom.append(fiber.dom);
-  }
+  // if (fiber.dom) {
+  //   fiberParent.dom.append(fiber.dom);
+  // }
 
   commitWork(fiber.child);
   commitWork(fiber.sibling);

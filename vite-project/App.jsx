@@ -112,8 +112,8 @@ import {Todo} from "./src/Todo.jsx";
 function App (){
 
     return (<div>
-App
-<Todo />
+        App
+        <Todo />
     </div>)
 }
 
