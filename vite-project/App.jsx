@@ -1,4 +1,5 @@
 import React from "./core/React.js";
+import {Todo} from "./src/Todo.jsx";
 // let count = 1;
 // const props = {id:"test"}
 // function Counter({num}){
@@ -31,27 +32,50 @@ import React from "./core/React.js";
 //     return <Counter num={10}>count</Counter>
 // }
 
-let countFoo = 1;
-function Foo(){
-    const [count, setCount] = React.useState(10)
-    const [bar, setBar] = React.useState('bar')
-    // const update = React.update();
-    function handleClick(){
-        // countFoo++;
-        // update()
-        setCount((c)=>c+1)
-        // setBar((s)=> s+'123')
-        setBar('bar')
-    }
-    return (
-        <div>
-            <h1>foo</h1>
-            <h1>{count}</h1>
-            <h1>{bar}</h1>
-            <button onClick={handleClick}>click</button>
-        </div>
-    )
-}
+// let countFoo = 1;
+// function Foo(){
+//     const [count, setCount] = React.useState(10)
+//     const [bar, setBar] = React.useState('bar')
+
+//     React.useEffect(()=>{
+//         console.log('useEffect init');
+//         return ()=>{
+//             console.log('cleanup 0');
+//         }
+//     },[])
+    
+//     React.useEffect(()=>{
+//         console.log('update count');
+//         return ()=>{
+//             console.log('cleanup 0');
+//         }
+//     },[count])
+
+//     React.useEffect(()=>{
+//         console.log('update count2');
+//         return ()=>{
+//             console.log('cleanup 2');
+//         }
+//     },[count])
+//     // const update = React.update();
+//     function handleClick(){
+//         // countFoo++;
+//         // update()
+//         setCount((c)=>c+1)
+//         // setBar((s)=> s+'123')
+//         setBar('bar')
+//     }
+//     return (
+//         <div>
+//             <h1>foo</h1>
+//             <h1>{count}</h1>
+//             <h1>{bar}</h1>
+//             <button onClick={handleClick}>click</button>
+//         </div>
+//     )
+// }
+
+
 
 // let countBar = 1;
 // function Bar(){
@@ -69,21 +93,28 @@ function Foo(){
 //     )
 // }
 
-let countRoot = 1;
-function App (){
-    const update = React.update();
-    function handleClick(){
-        countRoot++;
-        update()
-    }
-    return (<div>hi,mini-react,countRoot:{countRoot}
-        {/* <button onClick={handleClick}>click</button> */}
-        <Foo />
-        {/* <Bar /> */}
-    </div>)
-}
+// let countRoot = 1;
+// function App (){
+//     const update = React.update();
+//     function handleClick(){
+//         countRoot++;
+//         update()
+//     }
+//     return (<div>hi,mini-react,countRoot:{countRoot}
+//         {/* <button onClick={handleClick}>click</button> */}
+//         <Foo />
+//         {/* <Bar /> */}
+//     </div>)
+// }
 
 // const App = <div>hi,mini-react<CounterContainer></CounterContainer>
 // </div>;
+function App (){
+
+    return (<div>
+App
+<Todo />
+    </div>)
+}
 
 export default App;

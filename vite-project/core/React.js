@@ -35,7 +35,7 @@ function render(el, container) {
 
 let wipRoot = null;
 let currentRoot = null;
-let wipFiber = null;
+let wipFiber = {};
 let nextWorkOfUnit = null;
 
 let deletions = [];
@@ -62,9 +62,53 @@ function workLoop(deadline) {
 function commitRoot() {
   deletions.forEach(commitDeletion);
   commitWork(wipRoot.child);
+  // 此刻调用effect
+  commitEffectHooks();
   currentRoot = wipRoot;
   wipRoot = null;
   deletions = [];
+}
+
+function commitEffectHooks() {
+  function run(fiber) {
+    if (!fiber) return;
+
+    if (!fiber.alternate) {
+      // init
+      // fiber.effectHook?.callback();
+      fiber.effectHooks?.forEach((hook) => {
+        hook.cleanup = hook.callback();
+      });
+    } else {
+      // update
+      // deps有没有发生改变
+      fiber.effectHooks?.forEach((newHook, index) => {
+        if (newHook.deps.length > 0) {
+          const oldEffectHook = fiber.alternate?.effectHooks[index];
+          // some
+          const needUpdate = oldEffectHook?.deps.some((oldDep, j) => {
+            return oldDep !== newHook.deps[j];
+          });
+          needUpdate && (newHook.cleanup = newHook.callback());
+        }
+      });
+    }
+
+    run(fiber.child);
+    run(fiber.sibling);
+  }
+  function runCleanup(fiber) {
+    if (!fiber) return;
+    fiber.alternate?.effectHooks?.forEach((hook) => {
+      if (hook.deps.length > 0) {
+        hook.cleanup && hook.cleanup();
+      }
+    });
+    runCleanup(fiber.child);
+    runCleanup(fiber.sibling);
+  }
+  runCleanup(wipRoot);
+  run(wipRoot);
 }
 
 function commitDeletion(fiber) {
@@ -207,6 +251,7 @@ function reconcileChildren(fiber, children) {
 function updateFunctionComponent(fiber) {
   stateHooks = []; // 初始化
   stateHookIndex = 0;
+  effectHooks = [];
   wipFiber = fiber;
   const children = [fiber.type(fiber.props)];
   reconcileChildren(fiber, children);
@@ -308,11 +353,23 @@ function useState(initial) {
   }
   return [stateHook.state, setState];
 }
+// 调用时机？在react完成对 dom 的渲染之后，并且浏览器完成绘制之前
+let effectHooks;
+function useEffect(callback, deps) {
+  const effectHook = {
+    callback,
+    deps,
+    cleanup: undefined,
+  };
+  effectHooks.push(effectHook);
+  wipFiber.effectHooks = effectHooks;
+}
 const React = {
   render,
   update,
   createElement,
   useState,
+  useEffect,
 };
 
 export default React;
